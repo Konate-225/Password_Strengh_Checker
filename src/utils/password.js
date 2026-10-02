@@ -46,7 +46,11 @@ export function analyzePassword(password) {
   if (!notCommon || !noRepeat) score = Math.min(score, 32)
   if (!password) score = 0
   const level = score >= 80 ? "Strong" : score >= 60 ? "Good" : score >= 35 ? "Fair" : "Weak"
-  const guesses = password ? zxcvbn(password).guesses : 0
+  const estimate = password ? zxcvbn(password) : null
+  const bruteForceOnly = estimate?.sequence.every((match) => match.pattern === "bruteforce")
+  const guesses = estimate
+    ? bruteForceOnly ? Math.max(estimate.guesses, pool ** password.length) : estimate.guesses
+    : 0
   const crackTime = password ? formatCrackTime(guesses / guessesPerSecond) : "—"
 
   return { checks, entropy, score, level, crackTime, types: [upper && "A–Z", lower && "a–z", number && "0–9", symbol && "#!$"].filter(Boolean) }
