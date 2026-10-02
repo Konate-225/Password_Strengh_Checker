@@ -1,4 +1,28 @@
+import zxcvbn from "zxcvbn"
+
 const commonPasswords = ["password", "password123", "123456", "qwerty", "letmein", "admin", "welcome"]
+const guessesPerSecond = 10_000_000_000
+const secondsPerYear = 365.25 * 24 * 60 * 60
+
+function formatCrackTime(seconds) {
+  if (!Number.isFinite(seconds)) return "Over 10^300 years"
+  if (seconds < 1) return "Less than a second"
+
+  const units = [
+    [secondsPerYear, "year"],
+    [24 * 60 * 60, "day"],
+    [60 * 60, "hour"],
+    [60, "minute"],
+    [1, "second"],
+  ]
+  const [unitSeconds, unitName] = units.find(([duration]) => seconds >= duration)
+  const amount = Math.ceil(seconds / unitSeconds)
+  const formattedAmount = amount >= 1_000
+    ? new Intl.NumberFormat("en", { notation: "scientific", maximumSignificantDigits: 2 }).format(amount)
+    : amount.toLocaleString("en")
+
+  return `${formattedAmount} ${unitName}${amount === 1 ? "" : "s"}`
+}
 
 export function analyzePassword(password) {
   const upper = /[A-Z]/.test(password)
@@ -22,7 +46,8 @@ export function analyzePassword(password) {
   if (!notCommon || !noRepeat) score = Math.min(score, 32)
   if (!password) score = 0
   const level = score >= 80 ? "Strong" : score >= 60 ? "Good" : score >= 35 ? "Fair" : "Weak"
-  const crackTime = entropy < 28 ? "Instantly" : entropy < 40 ? "A few minutes" : entropy < 60 ? "About 3 years" : entropy < 80 ? "Centuries" : "Millions of years"
+  const guesses = password ? zxcvbn(password).guesses : 0
+  const crackTime = password ? formatCrackTime(guesses / guessesPerSecond) : "—"
 
   return { checks, entropy, score, level, crackTime, types: [upper && "A–Z", lower && "a–z", number && "0–9", symbol && "#!$"].filter(Boolean) }
 }

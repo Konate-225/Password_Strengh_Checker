@@ -55,7 +55,7 @@ function CheckerPage({ theme, onThemeToggle, onLogin, onSignup, user, onLogout }
           <div className="progress-meta"><span>Security strength</span><strong>{analysis.score}<small>/100</small></strong></div>
           <div className="progress-track"><div className={`progress-fill ${analysis.level.toLowerCase()}`} style={{ width: `${analysis.score}%` }} /></div>
           <div className="metrics">
-            <Metric icon="clock" label="EST. CRACK TIME"><strong>{analysis.crackTime}</strong></Metric>
+            <Metric icon="clock" label="EST. CRACK TIME" title="Estimate assumes an offline attack at 10 billion guesses per second. Actual time depends on the hashing method and attacker."><strong>{analysis.crackTime}</strong></Metric>
             <Metric icon="chart" label="ENTROPY"><strong>{analysis.entropy} <small>bits</small></strong></Metric>
             <Metric icon="hash" label="LENGTH"><strong>{analyzedPassword.length} <small>characters</small></strong></Metric>
             <Metric icon="layers" label="CHARACTER TYPES"><p>{analysis.types.length ? analysis.types.map((type) => <b key={type}>{type}</b>) : <small>None detected</small>}</p></Metric>
@@ -74,8 +74,8 @@ function CheckerPage({ theme, onThemeToggle, onLogin, onSignup, user, onLogout }
   )
 }
 
-function Metric({ icon, label, children }) {
-  return <div className="metric"><span className="metric-icon violet"><Icon name={icon} /></span><div><span>{label}</span>{children}</div></div>
+function Metric({ icon, label, title, children }) {
+  return <div className="metric" title={title}><span className="metric-icon violet"><Icon name={icon} /></span><div><span>{label}</span>{children}</div></div>
 }
 
 function Suggestions({ analysis, password }) {
