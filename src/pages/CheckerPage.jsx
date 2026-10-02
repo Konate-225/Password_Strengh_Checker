@@ -8,11 +8,12 @@ const initialGenerator = { length: 18, uppercase: true, lowercase: true, numbers
 
 function CheckerPage({ theme, onThemeToggle, onLogin, onSignup, user, onLogout }) {
   const [password, setPassword] = useState("")
+  const [analyzedPassword, setAnalyzedPassword] = useState("")
   const [visible, setVisible] = useState(false)
   const [generator, setGenerator] = useState(initialGenerator)
   const [generated, setGenerated] = useState("K7!vQ2#nX9@mR4$zLp")
   const [openTip, setOpenTip] = useState(null)
-  const analysis = useMemo(() => analyzePassword(password), [password])
+  const analysis = useMemo(() => analyzePassword(analyzedPassword), [analyzedPassword])
 
   const generate = (useMain = false) => {
     const next = makePassword(generator)
@@ -39,7 +40,7 @@ function CheckerPage({ theme, onThemeToggle, onLogin, onSignup, user, onLogout }
               <div className="field-copy"><CopyButton value={password} compact /></div>
             </div>
             <button className="button secondary generate-top" type="button" onClick={() => generate(true)}><Icon name="sparkle" /><span>Generate</span></button>
-            <button className="button primary" type="button"><span>Analyze</span><Icon name="arrow" /></button>
+            <button className="button primary" type="button" onClick={() => setAnalyzedPassword(password)}><span>Analyze</span><Icon name="arrow" /></button>
           </div>
         </div>
       </section>
@@ -52,14 +53,14 @@ function CheckerPage({ theme, onThemeToggle, onLogin, onSignup, user, onLogout }
           <div className="metrics">
             <Metric icon="clock" label="EST. CRACK TIME"><strong>{analysis.crackTime}</strong></Metric>
             <Metric icon="chart" label="ENTROPY"><strong>{analysis.entropy} <small>bits</small></strong></Metric>
-            <Metric icon="hash" label="LENGTH"><strong>{password.length} <small>characters</small></strong></Metric>
+            <Metric icon="hash" label="LENGTH"><strong>{analyzedPassword.length} <small>characters</small></strong></Metric>
             <Metric icon="layers" label="CHARACTER TYPES"><p>{analysis.types.length ? analysis.types.map((type) => <b key={type}>{type}</b>) : <small>None detected</small>}</p></Metric>
           </div>
         </section>
 
         <section className="two-column">
           <div className="glass checklist-card"><div className="section-heading compact"><div><span className="section-kicker">SECURITY CHECKLIST</span><h2>Protection essentials</h2></div><span className="count-badge">{analysis.checks.filter((check) => check[2]).length}/7</span></div><div className="checklist">{analysis.checks.map(([id, label, ok]) => <div className={`check-item ${ok ? "passed" : ""}`} key={id}><span className="check-status">{ok ? "✓" : "×"}</span><span>{label}</span><small>{ok ? "Passed" : "Missing"}</small></div>)}</div></div>
-          <Suggestions analysis={analysis} password={password} />
+          <Suggestions analysis={analysis} password={analyzedPassword} />
         </section>
 
         <GeneratorPanel generator={generator} setGenerator={setGenerator} generated={generated} onGenerate={() => generate(false)} />
