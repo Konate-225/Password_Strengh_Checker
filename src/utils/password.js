@@ -2,6 +2,7 @@ import zxcvbn from "zxcvbn"
 
 const commonPasswords = ["password", "password123", "123456", "qwerty", "letmein", "admin", "welcome"]
 const guessesPerSecond = 10_000_000_000
+const onlineGuessesPerHour = 100
 const secondsPerYear = 365.25 * 24 * 60 * 60
 
 function formatCrackTime(seconds) {
@@ -69,7 +70,12 @@ export function analyzePassword(password) {
   const guesses = estimate
     ? bruteForceOnly ? Math.max(estimate.guesses, pool ** password.length) : estimate.guesses
     : 0
-  const crackTime = password ? formatCrackTime(guesses / guessesPerSecond) : "—"
+  const crackTime = password
+    ? {
+        online: formatCrackTime(guesses / (onlineGuessesPerHour / 60 / 60)),
+        offline: formatCrackTime(guesses / guessesPerSecond),
+      }
+    : { online: "—", offline: "—" }
 
   return { checks, entropy, score, level, crackTime, types: [upper && "A–Z", lower && "a–z", number && "0–9", symbol && "#!$"].filter(Boolean) }
 }

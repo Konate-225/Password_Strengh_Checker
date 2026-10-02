@@ -55,7 +55,12 @@ function CheckerPage({ theme, onThemeToggle, onLogin, onSignup, user, onLogout }
           <div className="progress-meta"><span>Security strength</span><strong>{analysis.score}<small>/100</small></strong></div>
           <div className="progress-track"><div className={`progress-fill ${analysis.level.toLowerCase()}`} style={{ width: `${analysis.score}%` }} /></div>
           <div className="metrics">
-            <Metric icon="clock" label="EST. CRACK TIME" title="Estimate assumes an offline attack at 10 billion guesses per second. Actual time depends on the hashing method and attacker."><strong>{analysis.crackTime}</strong></Metric>
+            <Metric icon="clock" label="EST. CRACK TIME" title="Online assumes 100 guesses per hour; offline assumes 10 billion guesses per second. Actual time depends on rate limits and password hashing.">
+              <div className="crack-time-estimates">
+                <div><small>Online</small><strong>{analysis.crackTime.online}</strong></div>
+                <div><small>Offline</small><strong>{analysis.crackTime.offline}</strong></div>
+              </div>
+            </Metric>
             <Metric icon="chart" label="ENTROPY"><strong>{analysis.entropy} <small>bits</small></strong></Metric>
             <Metric icon="hash" label="LENGTH"><strong>{analyzedPassword.length} <small>characters</small></strong></Metric>
             <Metric icon="layers" label="CHARACTER TYPES"><p>{analysis.types.length ? analysis.types.map((type) => <b key={type}>{type}</b>) : <small>None detected</small>}</p></Metric>
