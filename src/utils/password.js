@@ -17,9 +17,27 @@ function formatCrackTime(seconds) {
   ]
   const [unitSeconds, unitName] = units.find(([duration]) => seconds >= duration)
   const amount = Math.ceil(seconds / unitSeconds)
-  const formattedAmount = amount >= 1_000
-    ? new Intl.NumberFormat("en", { notation: "scientific", maximumSignificantDigits: 2 }).format(amount)
-    : amount.toLocaleString("en")
+  if (unitName === "year") {
+    const longDurations = [
+      [1e18, "Quintillions of years"],
+      [1e15, "Quadrillions of years"],
+      [1e12, "Trillions of years"],
+      [1e9, "Billions of years"],
+      [1e6, "Millions of years"],
+    ]
+    const longDuration = longDurations.find(([size]) => amount >= size)
+    if (longDuration) return longDuration[1]
+
+    if (amount >= 1_000) {
+      const millennia = Math.round((amount / 1_000) * 10) / 10
+      return `${millennia.toLocaleString("en")} millennia`
+    }
+    if (amount >= 100) {
+      const centuries = Math.round((amount / 100) * 10) / 10
+      return `${centuries.toLocaleString("en")} ${centuries === 1 ? "century" : "centuries"}`
+    }
+  }
+  const formattedAmount = amount.toLocaleString("en")
 
   return `${formattedAmount} ${unitName}${amount === 1 ? "" : "s"}`
 }
