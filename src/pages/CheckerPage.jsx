@@ -9,6 +9,7 @@ const initialGenerator = { length: 18, uppercase: true, lowercase: true, numbers
 function CheckerPage({ theme, onThemeToggle, onLogin, onSignup, user, onLogout }) {
   const [password, setPassword] = useState("")
   const [analyzedPassword, setAnalyzedPassword] = useState("")
+  const [hasAnalyzed, setHasAnalyzed] = useState(false)
   const [visible, setVisible] = useState(false)
   const [generator, setGenerator] = useState(initialGenerator)
   const [generated, setGenerated] = useState("K7!vQ2#nX9@mR4$zLp")
@@ -18,7 +19,10 @@ function CheckerPage({ theme, onThemeToggle, onLogin, onSignup, user, onLogout }
   const generate = (useMain = false) => {
     const next = makePassword(generator)
     setGenerated(next)
-    if (useMain) setPassword(next)
+    if (useMain) {
+      setPassword(next)
+      if (hasAnalyzed) setAnalyzedPassword(next)
+    }
   }
 
   return (
@@ -35,12 +39,12 @@ function CheckerPage({ theme, onThemeToggle, onLogin, onSignup, user, onLogout }
           <div className="input-label"><span>Password</span></div>
           <div className="password-row">
             <div className="password-field">
-              <input aria-label="Password to analyze" type={visible ? "text" : "password"} value={password} onChange={(event) => setPassword(event.target.value)} placeholder="Enter a password to analyze..." />
+              <input aria-label="Password to analyze" type={visible ? "text" : "password"} value={password} onChange={(event) => { const nextPassword = event.target.value; setPassword(nextPassword); if (hasAnalyzed) setAnalyzedPassword(nextPassword) }} placeholder="Enter a password to analyze..." />
               <button className="field-action eye-button" type="button" onClick={() => setVisible(!visible)} aria-label={visible ? "Hide password" : "Show password"}><Icon name={visible ? "eyeOff" : "eye"} /></button>
               <div className="field-copy"><CopyButton value={password} compact /></div>
             </div>
             <button className="button secondary generate-top" type="button" onClick={() => generate(true)}><Icon name="sparkle" /><span>Generate</span></button>
-            <button className="button primary" type="button" onClick={() => setAnalyzedPassword(password)}><span>Analyze</span><Icon name="arrow" /></button>
+            <button className="button primary" type="button" onClick={() => { setAnalyzedPassword(password); setHasAnalyzed(true) }}><span>Analyze</span><Icon name="arrow" /></button>
           </div>
         </div>
       </section>
